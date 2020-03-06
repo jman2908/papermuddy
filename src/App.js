@@ -1,129 +1,109 @@
 import React, { Component } from 'react';
+import Navbar from "./components/Navbar";
+import Header from "./components/Header";
+import Main from "./components/Main";
+import Footer from "./components/Footer";
+import Image from "./components/Image";
+import Img from "./components/Img.json"
+
+//image imports
+import contra from "./images/contra.gif"
+import dance from "./images/dance.gif"
+import donkeykong from "./images/donkeykong.gif"
+import duckhunt from "./images/duckhunt.gif"
+import kirby from "./images/kirby.gif"
+import kirbystarhighfive from "./images/kirbystarhighfive.gif"
+import marioextraspin from "./images/marioextraspin.gif"
+import marioworld from "./images/marioworld.gif"
+import toad from "./images/toad.gif"
+import waluigi from "./images/waluigi.gif"
+import zelda from "./images/zelda.gif"
+import koopa from "./images/koopa.gif"
+
 import './App.css';
-//  my compoenent
-import NavBar from './components/NavBar';
-import Banner from './components/Banner';
-import IconCard from './components/IconCard';
-import Icons from './icons.json';
-//
-import "./components/IconCard.css";
-//
-// import "tachyons";
-// import "hover";
-// import "animate";
 
-
-const shuffleArray = (array) => {
-  let counter = array.length;
-  // While there are elements in the array
-  while (counter > 0) {
-      // Pick a random index
-      let index = Math.floor(Math.random() * counter);
-      // Decrease counter by 1
-      counter--;
-      // And swap the last element with it
-      let temp = array[counter];
-      array[counter] = array[index];
-      array[index] = temp;
-  }
-  return array;
-};
 class App extends Component {
-
   state = {
-    currentScore: 0,
-    topScore: 0,
-    result: "",
-    clicked: [],
-    Icons,
-    gameOver: false
+    picked: [],
+    correct: 0,
+    topscore: 0,
+    message: 'Click an image to begin'
   };
 
-  // When the page loads and the component mounts,
-  // display starting message
-  componentDidMount() {
-    this.setState({result: "Click a player to get started"})
+//Shuffle Array
+  shuffleArray = (array) => {
+    let imgArray = Img;
+    for (let i = imgArray.length - 1; i > 0; i--) {
+      let j = Math.floor(Math.random() * (i + 1));
+      [imgArray[i], imgArray[j]] = [imgArray[j], imgArray[i]];
+    }
+    return imgArray
   }
 
-  // When a player gets clicked,
-  // increase points and add id of element to array.
-  clickedPlayer = (id) => {
-    console.log(`Picture clicked with id: ${id}`);
-    if(!this.state.clicked.includes(id)){
-      this.pointIncrease();
-      this.state.clicked.push(id);
+  pickImg = (name) => {
+    console.log("Clicked!!");
+    let picked = this.state.picked;
+    
+    if (picked.indexOf(name) === -1) {
       this.setState({
-        gameOver: false
-      });
-    } else {
-      this.resetGame();
+        picked: picked.concat(name),
+        correct: this.state.correct + 1,
+        topscore: this.state.correct + 1 > this.state.topscore ? this.state.correct + 1 : this.state.topscore,
+        message: "Correct: Good choice!" 
+      })
+      this.shuffleArray();
+    }
+    else {
+      this.setState({
+        message: "Already Selected Game Over, Replay?",
+        correct: 0,
+        picked: []
+      })
     }
   }
 
-  // When the user makes a new click, increment the points by 1
-  // and check if the user has won
-  pointIncrease = () => {
-    let score = this.state.currentScore + 1;
-    console.log(`the score is ${score}`);
-    if (score === this.state.Icons.length) {
-      this.setState({
-        result: "You win! Start clicking to play again!",
-        topScore: score,
-        currentScore: 0,
-        clicked: [],
-        Icons,
-        gameOver: false
-      });
-    } else if (score > this.state.topScore) {
-      this.setState({
-        topScore: score,
-        currentScore: score,
-        result: "Correct! New high score!",
-      });
-    } else {
-      this.setState({
-        currentScore: score,
-        result: "Correct!"
-      });
+  imgSwitch = (name) => {
+    switch (name) {
+      case "contra":
+        return `${contra}`
+      case "dance":
+        return `${dance}`
+      case "donkeykong":
+        return `${donkeykong}`
+      case "duckhunt":
+        return `${duckhunt}`
+      case "kirby":
+        return `${kirby}`
+      case "kirbystarhighfive":
+        return `${kirbystarhighfive}`
+      case "marioextraspin":
+        return `${marioextraspin}`
+      case "marioworld":
+        return `${marioworld}`
+      case "toad":
+        return `${toad}`
+      case "waluigi":
+        return `${waluigi}`
+      case "zelda":
+        return `${zelda}`
+      case "koopa":
+        return `${koopa}`
+      default:
+        return `${koopa}`
     }
-    this.resetIconArray();
-  }
-
-  // reset the game when the user chooses a duplicate
-  resetGame = () => {
-    this.setState({
-      points: 0,
-      currentScore:0,
-      topScore: this.state.topScore,
-      result: "You Loss!",
-      clicked: [],
-      Icons,
-      gameOver: true
-    });
-    console.log('Game over? ', this.state.gameOver);
-    this.resetIconArray();
-  }
-
-  // set the array to be mapped to a new scrambled version using shuffle algorithm
-  resetIconArray = () => {
-    let newScramble = shuffleArray(Icons);
-    this.setState({Icons: newScramble})
   }
 
   render() {
     return (
-      <div className='container'>
-        <NavBar topScore={this.state.topScore} currentScore={this.state.currentScore} status={this.state.result}/>
-        <Banner />
-        <div className='mainStyle'>
-        {this.state.Icons.map(icon => (
-        <IconCard
-          id={icon.id}
-          image={icon.image}
-          clickedPlayer={this.clickedPlayer}
-        />
-        ))}
-        </div>
+      <div>
+        <Navbar correct={this.state.correct} topscore={this.state.topscore} message={this.state.message}/>
+        <Header />
+        <Main>
+          {this.shuffleArray(Img).map(image => (
+            <Image src={this.imgSwitch(image.name)} name={image.name} key={image.name} pickImg={this.pickImg}  />
+          ))}
+        </Main>
+        <Footer />
       </div>
     );
   }
